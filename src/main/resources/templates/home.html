@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radical Learn | Master Your Craft</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0d0d0d;
+            --paper: #f7f5f0;
+            --accent: #e8401c;
+            --accent-2: #1c6ee8;
+            --muted: #7a7672;
+            --card-bg: #ffffff;
+            --border: rgba(13,13,13,0.1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--paper);
+            color: var(--ink);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, .display { font-family: 'Syne', sans-serif; }
+
+        /* ── NAV ── */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(247,245,240,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+        }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 68px;
+        }
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em;
+            color: var(--ink); text-decoration: none;
+            display: flex; align-items: center; gap: 0.35rem;
+        }
+        .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; margin-bottom: 2px; }
+        .nav-links { display: flex; gap: 2.5rem; }
+        .nav-links a {
+            font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.875rem;
+            color: var(--muted); text-decoration: none; letter-spacing: 0.01em;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--ink); }
+        .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8125rem;
+            letter-spacing: 0.02em; text-decoration: none; cursor: pointer;
+            border: none; outline: none; transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .btn-ghost {
+            padding: 0.5rem 1rem; color: var(--muted);
+            background: transparent; border-radius: 6px;
+        }
+        .btn-ghost:hover { background: rgba(13,13,13,0.06); color: var(--ink); }
+        .btn-primary {
+            padding: 0.55rem 1.25rem; background: var(--ink); color: #fff;
+            border-radius: 6px;
+        }
+        .btn-primary:hover { background: #2a2a2a; transform: translateY(-1px); }
+        .btn-accent {
+            padding: 0.55rem 1.25rem; background: var(--accent); color: #fff;
+            border-radius: 6px;
+        }
+        .btn-accent:hover { background: #c7361a; transform: translateY(-1px); }
+        .btn-teal {
+            padding: 0.55rem 1.25rem; background: #0d9488; color: #fff; border-radius: 6px;
+        }
+        .btn-teal:hover { background: #0a7d72; transform: translateY(-1px); }
+
+        /* ── HERO ── */
+        .hero {
+            max-width: 1200px; margin: 0 auto;
+            padding: 5rem 2rem 4rem;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 4rem; align-items: center;
+        }
+        @media (max-width: 900px) { .hero { grid-template-columns: 1fr; padding: 3rem 1.5rem 2rem; } }
+
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 0.75rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 1.5rem;
+        }
+        .hero-eyebrow::before { content: ''; width: 24px; height: 1.5px; background: var(--accent); display: block; }
+
+        h1.hero-title {
+            font-size: clamp(2.75rem, 5vw, 4.5rem);
+            font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
+            color: var(--ink); margin-bottom: 1.5rem;
+        }
+        h1.hero-title em { font-style: normal; color: var(--accent); }
+
+        .hero-body {
+            font-size: 1.0625rem; line-height: 1.75; color: var(--muted);
+            max-width: 480px; margin-bottom: 2.5rem; font-weight: 300;
+        }
+
+        .hero-cta { display: flex; gap: 0.875rem; flex-wrap: wrap; }
+        .btn-hero {
+            padding: 0.875rem 2rem; font-size: 0.9375rem;
+            border-radius: 8px;
+        }
+
+        .hero-stats {
+            display: flex; gap: 2.5rem; margin-top: 3rem;
+            padding-top: 2rem; border-top: 1px solid var(--border);
+        }
+        .stat-num {
+            font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.75rem;
+            letter-spacing: -0.03em; color: var(--ink); display: block;
+        }
+        .stat-label {
+            font-size: 0.75rem; color: var(--muted); font-weight: 400;
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+
+        /* ── HERO VISUAL ── */
+        .hero-visual {
+            position: relative; height: 420px;
+        }
+        @media (max-width: 900px) { .hero-visual { display: none; } }
+
+        .card-float {
+            position: absolute;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.05);
+            transition: transform 0.4s ease;
+        }
+        .card-float:hover { transform: translateY(-6px) !important; }
+
+        .card-pdf {
+            width: 220px; top: 20px; left: 10px;
+            transform: rotate(-4deg);
+        }
+        .card-article {
+            width: 240px; bottom: 20px; right: 0px;
+            transform: rotate(3deg);
+        }
+        .card-badge {
+            width: 130px; top: 50%; left: 55%;
+            transform: translate(-50%, -50%) rotate(8deg);
+            text-align: center; padding: 1rem;
+        }
+
+        .card-icon-wrap {
+            width: 44px; height: 44px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; margin-bottom: 0.875rem;
+        }
+        .card-tag {
+            font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.4rem;
+        }
+        .card-title {
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9375rem;
+            line-height: 1.3; color: var(--ink);
+        }
+        .card-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem; }
+
+        /* ── TICKER ── */
+        .ticker {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: var(--ink); color: #fff;
+            overflow: hidden; padding: 0.85rem 0;
+            margin: 0 0 5rem;
+        }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .ticker-track {
+            display: flex; width: 200%; white-space: nowrap;
+            animation: ticker 22s linear infinite;
+        }
+        .ticker-item {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            font-family: 'Syne', sans-serif; font-size: 0.8125rem; font-weight: 600;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            padding: 0 2.5rem; color: rgba(255,255,255,0.85);
+        }
+        .ticker-sep { color: var(--accent); font-size: 0.625rem; }
+
+        /* ── SECTION LABELS ── */
+        .section-eyebrow {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--muted); margin-bottom: 0.875rem;
+        }
+        .section-eyebrow::before { content: ''; width: 20px; height: 1.5px; background: var(--muted); }
+
+        /* ── LIBRARY ── */
+        #tracks { max-width: 1200px; margin: 0 auto; padding: 0 2rem 6rem; }
+
+        .library-header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 3rem; gap: 2rem; flex-wrap: wrap;
+        }
+        .library-title {
+            font-size: clamp(2rem, 3vw, 2.75rem);
+            font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center; padding: 6rem 2rem;
+            border: 1.5px dashed var(--border); border-radius: 16px;
+        }
+        .empty-icon {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: rgba(13,13,13,0.04);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: var(--muted);
+            margin: 0 auto 1.25rem;
+        }
+        .empty-state h3 {
+            font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.5rem;
+        }
+        .empty-state p { color: var(--muted); font-size: 0.9375rem; }
+
+        /* ── COURSE GRID ── */
+        .course-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+        @media (max-width: 600px) { .course-grid { grid-template-columns: 1fr; } }
+
+        .course-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+            display: flex; flex-direction: column;
+        }
+        .course-card:hover {
+            box-shadow: 0 24px 64px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+        }
+
+        .course-card-top { padding: 1.75rem 1.75rem 1.5rem; flex: 1; }
+
+        .course-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.25rem;
+        }
+        .course-cat {
+            font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--ink);
+            background: rgba(13,13,13,0.06); padding: 0.3rem 0.6rem; border-radius: 4px;
+        }
+        .course-types {
+            display: flex; gap: 0.35rem;
+        }
+        .type-pill {
+            font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+            padding: 0.25rem 0.5rem; border-radius: 4px;
+        }
+        .type-pdf { background: #fff0ed; color: var(--accent); }
+        .type-article { background: #edf4ff; color: var(--accent-2); }
+
+        .course-title {
+            font-size: 1.1875rem; font-weight: 700; letter-spacing: -0.02em;
+            line-height: 1.35; color: var(--ink); margin-bottom: 0.75rem;
+            transition: color 0.2s;
+        }
+        .course-card:hover .course-title { color: var(--accent); }
+
+        .course-desc {
+            font-size: 0.875rem; color: var(--muted); line-height: 1.65;
+            font-weight: 300;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .course-instructor {
+            display: flex; align-items: center; gap: 0.625rem; margin-top: 1.25rem;
+            padding-top: 1.25rem; border-top: 1px solid var(--border);
+        }
+        .instructor-avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.625rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .instructor-name { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+
+        .course-card-bottom {
+            padding: 1.125rem 1.75rem;
+            background: rgba(13,13,13,0.025);
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .price-free {
+            font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.9rem;
+            letter-spacing: 0.04em; color: #0d9488; text-transform: uppercase;
+        }
+        .btn-card {
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.75rem;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            padding: 0.5rem 1rem; border-radius: 6px;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;
+            transition: all 0.2s;
+        }
+        .btn-card-login { background: var(--ink); color: #fff; }
+        .btn-card-login:hover { background: #2a2a2a; }
+        .btn-card-access { background: #0d9488; color: #fff; }
+        .btn-card-access:hover { background: #0a7d72; }
+
+        /* ── FEATURES ── */
+        .features {
+            background: var(--ink); color: #fff;
+            padding: 5rem 2rem; margin-bottom: 6rem;
+        }
+        .features-inner { max-width: 1200px; margin: 0 auto; }
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
+        @media (max-width: 768px) { .features-grid { grid-template-columns: 1fr; } }
+
+        .feature-item { padding: 1.75rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; }
+        .feature-icon {
+            width: 40px; height: 40px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; margin-bottom: 1.25rem;
+        }
+        .feature-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .feature-body { font-size: 0.875rem; color: rgba(255,255,255,0.5); line-height: 1.65; font-weight: 300; }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem;
+        }
+        .footer-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 2rem; flex-wrap: wrap;
+        }
+        .footer-logo {
+            font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.125rem;
+            letter-spacing: -0.02em; color: var(--ink); text-decoration: none;
+        }
+        .footer-links { display: flex; gap: 2rem; }
+        .footer-links a {
+            font-size: 0.8125rem; color: var(--muted); text-decoration: none;
+            font-weight: 500; transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--ink); }
+        .footer-contact a {
+            font-size: 0.875rem; color: var(--accent); text-decoration: none; font-weight: 500;
+        }
+        .footer-contact a:hover { text-decoration: underline; }
+        .footer-copy {
+            max-width: 1200px; margin: 2rem auto 0;
+            padding-top: 1.5rem; border-top: 1px solid var(--border);
+            font-size: 0.75rem; color: var(--muted);
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .fade-up { animation: fadeUp 0.6s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.22s; }
+        .delay-3 { animation-delay: 0.34s; }
+        .delay-4 { animation-delay: 0.46s; }
+
+        /* ── GRAIN OVERLAY ── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+    <div class="nav-inner">
+        <a th:href="@{/}" href="#" class="logo">
+            <span class="logo-dot"></span>Radical
+        </a>
+
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#tracks">Library</a>
+            <a href="#contact">Contact</a>
+        </div>
+
+        <div class="nav-actions">
+            <div sec:authorize="!isAuthenticated()">
+                <a th:href="@{/login}" href="#" class="btn btn-ghost">Log in</a>
+                <a th:href="@{/register}" href="#" class="btn btn-primary">Get started &rarr;</a>
+            </div>
+            <div sec:authorize="hasAuthority('ROLE_STUDENT')">
+                <a th:href="@{/student/dashboard}" href="#" class="btn btn-teal">My Desk &rarr;</a>
+            </div>
+            <div sec:authorize="hasAuthority('ROLE_INSTRUCTOR')">
+                <a th:href="@{/instructor/courses}" href="#" class="btn btn-accent">Instructor Panel &rarr;</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+    <div>
+        <p class="hero-eyebrow fade-up">The Knowledge Library</p>
+        <h1 class="hero-title fade-up delay-1">
+            Stop watching.<br>
+            Start <em>reading.</em><br>
+            Master it.
+        </h1>
+        <p class="hero-body fade-up delay-2">
+            Skip the bloated video courses. Our library of premium PDF guides and in-depth technical articles gets you from zero to proficient — on your schedule, at your pace.
+        </p>
+        <div class="hero-cta fade-up delay-3">
+            <a href="#tracks" class="btn btn-accent btn-hero">Browse Library &rarr;</a>
+            <a th:href="@{/register}" href="#" class="btn btn-ghost btn-hero" style="color: var(--ink); border: 1.5px solid var(--border); border-radius: 8px;">Create free account</a>
+        </div>
+        <div class="hero-stats fade-up delay-4">
+            <div>
+                <span class="stat-num">100%</span>
+                <span class="stat-label">Free to access</span>
+            </div>
+            <div>
+                <span class="stat-num">PDF + Text</span>
+                <span class="stat-label">Two formats</span>
+            </div>
+            <div>
+                <span class="stat-num">No fluff</span>
+                <span class="stat-label">Expert-written</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-visual fade-up delay-2">
+        <!-- PDF Card -->
+        <div class="card-float card-pdf">
+            <div class="card-tag">PDF Download</div>
+            <div class="card-icon-wrap" style="background: #fff0ed;">
+                <i class="fas fa-file-pdf" style="color: var(--accent);"></i>
+            </div>
+            <div class="card-title">Spring Boot<br>Cheat Sheet</div>
+            <div class="card-sub">8-page deep reference · 2.4 MB</div>
+        </div>
+
+        <!-- Article Card -->
+        <div class="card-float card-article">
+            <div class="card-tag">Text Article</div>
+            <div class="card-icon-wrap" style="background: #edf4ff;">
+                <i class="fas fa-align-left" style="color: var(--accent-2);"></i>
+            </div>
+            <div class="card-title">System Design<br>Principles</div>
+            <div class="card-sub">12 min read · Intermediate</div>
+        </div>
+
+        <!-- Badge -->
+        <div class="card-float card-badge" style="background: #f0fdf9; border-color: rgba(13,148,136,0.2);">
+            <i class="fas fa-check-circle" style="color: #0d9488; font-size: 1.75rem; margin-bottom: 0.5rem; display: block;"></i>
+            <div style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: #0d9488;">Free</div>
+            <div style="font-size: 0.65rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em;">Full access</div>
+        </div>
+    </div>
+</section>
+
+<!-- ── TICKER ── -->
+<div class="ticker">
+    <div class="ticker-track">
+        <span class="ticker-item"><span class="ticker-sep">◆</span> Premium PDF Guides</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> In-Depth Text Articles</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> Read at Your Own Pace</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> Zero Video Fluff</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> Expert-Written Content</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> Always Free to Access</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> Premium PDF Guides</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> In-Depth Text Articles</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> Read at Your Own Pace</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> Zero Video Fluff</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> Expert-Written Content</span>
+        <span class="ticker-item"><span class="ticker-sep">◆</span> Always Free to Access</span>
+    </div>
+</div>
+
+<!-- ── WHY RADICAL ── -->
+<div class="features">
+    <div class="features-inner">
+        <p class="section-eyebrow" style="color: rgba(255,255,255,0.4);">Why Radical</p>
+        <h2 style="font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 800; letter-spacing: -0.03em; max-width: 520px; line-height: 1.15;">
+            A smarter way to<br>learn technical skills.
+        </h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon" style="background: rgba(232,64,28,0.15);">
+                    <i class="fas fa-bolt" style="color: var(--accent);"></i>
+                </div>
+                <div class="feature-title">Scannable, not sittable</div>
+                <div class="feature-body">Reference what you need, when you need it. PDFs and articles are designed for scanning — not passive consumption.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon" style="background: rgba(28,110,232,0.15);">
+                    <i class="fas fa-pen-to-square" style="color: var(--accent-2);"></i>
+                </div>
+                <div class="feature-title">Written by practitioners</div>
+                <div class="feature-body">Every guide is authored by engineers and specialists who actually ship things — no theory-only fluff.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon" style="background: rgba(13,148,136,0.15);">
+                    <i class="fas fa-lock-open" style="color: #0d9488;"></i>
+                </div>
+                <div class="feature-title">Free, forever</div>
+                <div class="feature-body">No paywalls, no upsells, no drip courses. Create an account and access the entire library immediately.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── LIBRARY ── -->
+<section id="tracks">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem 6rem;">
+        <div class="library-header">
+            <div>
+                <p class="section-eyebrow">Resources</p>
+                <h2 class="library-title">Resource Library</h2>
+            </div>
+            <p style="color: var(--muted); font-size: 0.9375rem; max-width: 320px; text-align: right; line-height: 1.6; font-weight: 300;">
+                Every guide includes a downloadable PDF and a full text article — two formats, one price.
+            </p>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(courses)}" class="empty-state">
+            <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+            <h3>Library Coming Soon</h3>
+            <p>Our instructors are crafting new guides and PDFs. Check back shortly.</p>
+        </div>
+
+        <!-- Course Grid -->
+        <div th:if="${not #lists.isEmpty(courses)}" class="course-grid">
+            <div th:each="course : ${courses}" class="course-card">
+                <div class="course-card-top">
+                    <div class="course-meta">
+                        <span class="course-cat" th:text="${course.category.name}">Development</span>
+                        <div class="course-types">
+                            <span class="type-pill type-pdf"><i class="fas fa-file-pdf"></i> PDF</span>
+                            <span class="type-pill type-article"><i class="fas fa-align-left"></i> Article</span>
+                        </div>
+                    </div>
+                    <h3 class="course-title" th:text="${course.title}">Advanced Development</h3>
+                    <p class="course-desc" th:text="${course.description}">Learn things you won't find on YouTube.</p>
+                    <div class="course-instructor">
+                        <div class="instructor-avatar">
+                            <i class="fas fa-user" style="font-size: 0.7rem;"></i>
+                        </div>
+                        <span class="instructor-name" th:text="${course.instructor.name}">Instructor Name</span>
+                    </div>
+                </div>
+                <div class="course-card-bottom">
+                    <span class="price-free">Free</span>
+                    <div sec:authorize="!isAuthenticated()">
+                        <a th:href="@{/login}" href="#" class="btn-card btn-card-login">
+                            Read now <i class="fas fa-lock" style="font-size: 0.65rem;"></i>
+                        </a>
+                    </div>
+                    <div sec:authorize="hasAuthority('ROLE_STUDENT')">
+                        <a th:href="@{/student/dashboard}" href="#" class="btn-card btn-card-access">
+                            Get access <i class="fas fa-arrow-right" style="font-size: 0.7rem;"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer id="contact">
+    <div class="footer-inner">
+        <a href="#" class="footer-logo">Radical<span style="color: var(--accent);">.</span></a>
+        <div class="footer-contact">
+            <p style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 0.35rem;">Get in touch</p>
+            <a href="mailto:hello@radical.com">hello@radical.com</a>
+        </div>
+        <div class="footer-links">
+            <a href="#">Github</a>
+            <a href="#">Discord</a>
+            <a href="#">Newsletter</a>
+        </div>
+    </div>
+    <p class="footer-copy">&copy; 2026 Radical Systems Inc. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

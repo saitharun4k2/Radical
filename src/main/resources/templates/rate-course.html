@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rate Course | Radical</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root{--ink:#0d0d0d;--paper:#f7f5f0;--accent:#e8401c;--teal:#0d9488;--muted:#7a7672;--border-s:#e5e2dc;}
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;padding:2.5rem 2rem;display:flex;justify-content:center;align-items:flex-start;}
+        h1,.syne{font-family:'Syne',sans-serif;}
+        body::after{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+        /* Star selector */
+        .star-selector{display:flex;gap:.5rem;flex-direction:row-reverse;justify-content:flex-end;}
+        .star-selector input[type=radio]{display:none;}
+        .star-selector label{font-size:2rem;color:#d1d5db;cursor:pointer;transition:color .15s;}
+        .star-selector input[type=radio]:checked ~ label,
+        .star-selector label:hover,
+        .star-selector label:hover ~ label{color:#f59e0b;}
+    </style>
+</head>
+<body>
+<div style="width:100%;max-width:520px;">
+    <a th:href="@{/student/dashboard}" href="#" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.8125rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:1.75rem;transition:color .2s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--muted)'">
+        <i class="fas fa-arrow-left" style="font-size:.7rem;"></i> Cancel
+    </a>
+
+    <div style="background:#fff;border:1px solid rgba(13,13,13,.1);border-radius:16px;padding:2.5rem;box-shadow:0 16px 48px rgba(0,0,0,.06);">
+        <p style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem;"><span style="width:16px;height:1.5px;background:var(--muted);display:inline-block;"></span>Review</p>
+        <h1 style="font-size:1.625rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.5rem;">Leave a review</h1>
+        <p style="font-size:.875rem;color:var(--muted);font-weight:300;margin-bottom:2rem;" th:text="${course.title}">Course Title</p>
+
+        <form th:action="@{'/student/courses/' + ${course.id} + '/rate'}" method="POST" style="display:flex;flex-direction:column;gap:1.5rem;">
+
+            <!-- Star rating -->
+            <div>
+                <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.875rem;">Overall rating</label>
+                <div class="star-selector">
+                    <input type="radio" name="rating" id="s1" value="1">
+                    <label for="s1"><i class="fas fa-star"></i></label>
+                    <input type="radio" name="rating" id="s2" value="2">
+                    <label for="s2"><i class="fas fa-star"></i></label>
+                    <input type="radio" name="rating" id="s3" value="3">
+                    <label for="s3"><i class="fas fa-star"></i></label>
+                    <input type="radio" name="rating" id="s4" value="4">
+                    <label for="s4"><i class="fas fa-star"></i></label>
+                    <input type="radio" name="rating" id="s5" value="5" checked>
+                    <label for="s5"><i class="fas fa-star"></i></label>
+                </div>
+                <div id="ratingLabel" style="font-size:.8125rem;color:var(--muted);margin-top:.5rem;">5 — Masterpiece</div>
+            </div>
+
+            <!-- Written feedback -->
+            <div>
+                <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;">Written feedback <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);">(optional)</span></label>
+                <textarea name="comment" rows="4" placeholder="What did you learn? How could the instructor improve?"
+                          style="width:100%;background:#fff;border:1.5px solid var(--border-s);border-radius:8px;padding:.75rem 1rem;font-size:.9375rem;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;resize:vertical;line-height:1.65;transition:border-color .2s,box-shadow .2s;"
+                          onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 3px rgba(232,64,28,.1)'"
+                          onblur="this.style.borderColor='var(--border-s)';this.style.boxShadow='none'"></textarea>
+            </div>
+
+            <button type="submit"
+                    style="width:100%;background:var(--ink);color:#fff;border:none;border-radius:8px;padding:.9rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.9375rem;letter-spacing:.02em;cursor:pointer;transition:background .2s;"
+                    onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='var(--ink)'">
+                Submit review <i class="fas fa-paper-plane" style="font-size:.8rem;margin-left:.35rem;"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const labels = {1:'1 — Do Not Recommend', 2:'2 — Needs Work', 3:'3 — It was Okay', 4:'4 — Great Course', 5:'5 — Masterpiece'};
+    document.querySelectorAll('.star-selector input[type=radio]').forEach(r=>{
+        r.addEventListener('change', ()=>{ document.getElementById('ratingLabel').textContent = labels[r.value] || ''; });
+    });
+</script>
+</body>
+</html>

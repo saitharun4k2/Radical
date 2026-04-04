@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Courses | Radical_ Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0d0d0d;
+            --paper: #f7f5f0;
+            --accent: #e8401c;
+            --accent-2: #1c6ee8;
+            --muted: #7a7672;
+            --card-bg: #ffffff;
+            --border: rgba(13,13,13,0.1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--paper);
+            color: var(--ink);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Syne', sans-serif; }
+
+        body::after {
+            content: '';
+            position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* NAV */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(247,245,240,0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+        }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 68px;
+        }
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em;
+            color: var(--ink); text-decoration: none;
+            display: flex; align-items: center; gap: 0.35rem;
+        }
+        .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; margin-bottom: 2px; }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8125rem;
+            letter-spacing: 0.02em; text-decoration: none; cursor: pointer;
+            border: none; outline: none; transition: all 0.2s ease;
+        }
+        .btn-ghost { padding: 0.5rem 1rem; color: var(--muted); background: transparent; border-radius: 6px; }
+        .btn-ghost:hover { background: rgba(13,13,13,0.06); color: var(--ink); }
+        .btn-primary { padding: 0.55rem 1.25rem; background: var(--ink); color: #fff; border-radius: 6px; }
+        .btn-primary:hover { background: #2a2a2a; transform: translateY(-1px); }
+        .btn-accent { padding: 0.55rem 1.25rem; background: var(--accent); color: #fff; border-radius: 6px; }
+        .btn-accent:hover { background: #c7361a; transform: translateY(-1px); }
+
+        /* PAGE */
+        .page-wrap { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+        .back-link {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 0.8125rem; font-weight: 500; color: var(--muted);
+            text-decoration: none; margin-bottom: 2.5rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--ink); }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 3rem; padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap; gap: 1.5rem;
+        }
+
+        .section-eyebrow {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem;
+        }
+        .section-eyebrow::before { content: ''; width: 20px; height: 1.5px; background: var(--muted); display: block; }
+
+        .page-title {
+            font-size: clamp(1.75rem, 3vw, 2.5rem);
+            font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
+            color: var(--ink);
+        }
+
+        .btn-new {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8125rem;
+            letter-spacing: 0.02em; text-decoration: none;
+            padding: 0.65rem 1.5rem; background: var(--accent); color: #fff;
+            border-radius: 8px; transition: all 0.2s;
+        }
+        .btn-new:hover { background: #c7361a; transform: translateY(-1px); }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center; padding: 6rem 2rem;
+            border: 1.5px dashed var(--border); border-radius: 16px;
+            background: var(--card-bg);
+        }
+        .empty-icon {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: rgba(13,13,13,0.04);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: var(--muted);
+            margin: 0 auto 1.25rem;
+        }
+        .empty-state h2 { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+        .empty-state p { color: var(--muted); font-size: 0.9375rem; font-weight: 300; }
+
+        /* COURSE GRID */
+        .course-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+        @media (max-width: 600px) { .course-grid { grid-template-columns: 1fr; } }
+
+        .course-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+            display: flex; flex-direction: column;
+        }
+        .course-card:hover {
+            box-shadow: 0 24px 64px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+        }
+
+        .card-body { padding: 1.75rem 1.75rem 1.5rem; flex: 1; }
+
+        .card-tags { display: flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .tag {
+            font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.07em; padding: 0.3rem 0.65rem; border-radius: 4px;
+        }
+        .tag-cat { background: rgba(13,13,13,0.06); color: var(--ink); }
+        .tag-diff { background: #edf4ff; color: var(--accent-2); }
+
+        .card-title {
+            font-size: 1.1875rem; font-weight: 700; letter-spacing: -0.02em;
+            line-height: 1.35; color: var(--ink); margin-bottom: 0.75rem;
+            transition: color 0.2s;
+        }
+        .course-card:hover .card-title { color: var(--accent); }
+
+        .card-desc {
+            font-size: 0.875rem; color: var(--muted); line-height: 1.65;
+            font-weight: 300;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        /* CARD ACTIONS */
+        .card-actions {
+            border-top: 1px solid var(--border);
+            padding: 1rem 1.75rem;
+            background: rgba(13,13,13,0.025);
+            display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+        }
+
+        .action-btn {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.7rem;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            padding: 0.4rem 0.85rem; border-radius: 6px;
+            text-decoration: none; transition: all 0.2s; cursor: pointer;
+            border: none; outline: none;
+        }
+        .action-btn-teal { background: rgba(13,148,136,0.1); color: #0d9488; }
+        .action-btn-teal:hover { background: #0d9488; color: #fff; }
+        .action-btn-purple { background: rgba(124,58,237,0.08); color: #7c3aed; }
+        .action-btn-purple:hover { background: #7c3aed; color: #fff; }
+        .action-btn-blue { background: rgba(28,110,232,0.08); color: var(--accent-2); }
+        .action-btn-blue:hover { background: var(--accent-2); color: #fff; }
+        .action-btn-ink { background: rgba(13,13,13,0.06); color: var(--ink); }
+        .action-btn-ink:hover { background: var(--ink); color: #fff; }
+
+        .card-footer {
+            border-top: 1px solid var(--border);
+            padding: 0;
+        }
+        .delete-btn {
+            width: 100%; display: flex; align-items: center; justify-content: center;
+            gap: 0.5rem; padding: 0.85rem 1.75rem;
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.75rem;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            color: #dc2626; background: transparent;
+            transition: all 0.2s; cursor: pointer; border: none; outline: none;
+        }
+        .delete-btn:hover { background: #fef2f2; color: #b91c1c; }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 2rem;
+        }
+        .footer-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 1rem; flex-wrap: wrap;
+        }
+        .footer-logo {
+            font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem;
+            letter-spacing: -0.02em; color: var(--ink); text-decoration: none;
+        }
+        .footer-copy { font-size: 0.75rem; color: var(--muted); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-inner">
+        <a th:href="@{/}" class="logo">
+            <span class="logo-dot"></span>Radical
+        </a>
+        <a th:href="@{/instructor/dashboard}" class="btn btn-ghost">&larr; Dashboard</a>
+    </div>
+</nav>
+
+<div class="page-wrap">
+
+    <a th:href="@{/instructor/dashboard}" class="back-link">
+        <i class="fas fa-arrow-left" style="font-size:0.75rem;"></i> Back to Dashboard
+    </a>
+
+    <div class="page-header">
+        <div>
+            <p class="section-eyebrow">Instructor Panel</p>
+            <h1 class="page-title">Manage Content</h1>
+        </div>
+        <a th:href="@{/instructor/courses/create}" class="btn-new">
+            <i class="fas fa-plus" style="font-size:0.75rem;"></i> New Course
+        </a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(courses)}" class="empty-state">
+        <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+        <h2>It's awfully quiet here…</h2>
+        <p>You haven't created any courses yet. Time to share your knowledge!</p>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(courses)}" class="course-grid">
+
+        <div th:each="course:${courses}" class="course-card">
+
+            <div class="card-body">
+                <div class="card-tags">
+                    <span class="tag tag-cat" th:text="${course.category.name}">Category</span>
+                    <span class="tag tag-diff" th:text="${course.difficulty}">Difficulty</span>
+                </div>
+                <h3 class="card-title" th:text="${course.title}">Course Title</h3>
+                <p class="card-desc" th:text="${course.description}">Description goes here…</p>
+            </div>
+
+            <div class="card-actions">
+                <a th:href="@{/instructor/courses/{id}/modules(id=${course.id})}" class="action-btn action-btn-teal">
+                    <i class="fas fa-list-ul"></i> Modules
+                </a>
+                <a th:href="@{/instructor/courses/{id}/students(id=${course.id})}" class="action-btn action-btn-purple">
+                    <i class="fas fa-users"></i> Students
+                </a>
+                <a th:href="@{/instructor/courses/{id}/reviews(id=${course.id})}" class="action-btn action-btn-blue">
+                    <i class="fas fa-star"></i> Reviews
+                </a>
+                <a th:href="@{/instructor/courses/{id}/edit(id=${course.id})}" class="action-btn action-btn-ink">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+            </div>
+
+            <div class="card-footer">
+                <form th:action="@{'/instructor/courses/' + ${course.id} + '/delete'}" method="POST" class="m-0"
+                      onsubmit="return confirm('Are you sure you want to delete this entire course? All modules, lessons, and enrollments will be permanently erased.');">
+                    <button type="submit" class="delete-btn">
+                        <i class="fas fa-trash-alt"></i> Delete Course
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    <div class="footer-inner">
+        <a href="#" class="footer-logo">Radical<span style="color:var(--accent);">.</span></a>
+        <p class="footer-copy">&copy; 2025 Radical Studio. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>

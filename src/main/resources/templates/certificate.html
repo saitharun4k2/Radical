@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate of Completion | Radical</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root{--ink:#0d0d0d;--paper:#f7f5f0;--accent:#e8401c;--teal:#0d9488;--gold:#b5903a;--muted:#7a7672;--border-s:#e5e2dc;}
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem;}
+        h1,h2,.syne{font-family:'Syne',sans-serif;}
+        *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+        .cert-wrap{width:100%;max-width:1000px;aspect-ratio:1.414/1;background:#fff;border-radius:4px;position:relative;overflow:hidden;border:1px solid var(--border-s);}
+        /* Decorative corners */
+        .cert-corner{position:absolute;width:120px;height:120px;}
+        .cert-corner svg{width:100%;height:100%;}
+        @media print{
+            body{padding:0;background:#fff;}
+            .no-print{display:none!important;}
+            .cert-wrap{max-width:none;width:100vw;border:none;box-shadow:none;}
+        }
+    </style>
+</head>
+<body>
+
+<!-- Controls -->
+<div class="no-print" style="width:100%;max-width:1000px;display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <a th:href="@{/student/dashboard}" href="#"
+       style="display:inline-flex;align-items:center;gap:.4rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-decoration:none;background:rgba(13,13,13,.06);border-radius:6px;padding:.5rem 1rem;transition:all .2s;"
+       onmouseover="this.style.color='var(--ink)';this.style.background='rgba(13,13,13,.1)'"
+       onmouseout="this.style.color='var(--muted)';this.style.background='rgba(13,13,13,.06)'">
+        <i class="fas fa-arrow-left" style="font-size:.7rem;"></i> Back to dashboard
+    </a>
+    <button onclick="window.print()"
+            style="display:inline-flex;align-items:center;gap:.5rem;background:var(--ink);color:#fff;border:none;border-radius:8px;padding:.65rem 1.375rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8125rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:background .2s;"
+            onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='var(--ink)'">
+        <i class="fas fa-download" style="font-size:.75rem;"></i> Save as PDF
+    </button>
+</div>
+
+<!-- Certificate -->
+<div class="cert-wrap" style="box-shadow:0 32px 80px rgba(0,0,0,.12);">
+
+    <!-- Fine border inset -->
+    <div style="position:absolute;inset:14px;border:1.5px solid rgba(181,144,58,.3);border-radius:2px;pointer-events:none;z-index:0;"></div>
+
+    <!-- Gold corner ornaments (top-left, top-right, bottom-left, bottom-right) -->
+    <div style="position:absolute;top:8px;left:8px;width:60px;height:60px;opacity:.6;">
+        <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0 L60 0 L0 60 Z" fill="rgba(181,144,58,.15)"/>
+            <path d="M0 0 L30 0 M0 0 L0 30" stroke="#b5903a" stroke-width="1.5"/>
+        </svg>
+    </div>
+    <div style="position:absolute;top:8px;right:8px;width:60px;height:60px;opacity:.6;transform:scaleX(-1);">
+        <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0 L60 0 L0 60 Z" fill="rgba(181,144,58,.15)"/>
+            <path d="M0 0 L30 0 M0 0 L0 30" stroke="#b5903a" stroke-width="1.5"/>
+        </svg>
+    </div>
+    <div style="position:absolute;bottom:8px;left:8px;width:60px;height:60px;opacity:.6;transform:scaleY(-1);">
+        <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0 L60 0 L0 60 Z" fill="rgba(181,144,58,.15)"/>
+            <path d="M0 0 L30 0 M0 0 L0 30" stroke="#b5903a" stroke-width="1.5"/>
+        </svg>
+    </div>
+    <div style="position:absolute;bottom:8px;right:8px;width:60px;height:60px;opacity:.6;transform:scale(-1);">
+        <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0 L60 0 L0 60 Z" fill="rgba(181,144,58,.15)"/>
+            <path d="M0 0 L30 0 M0 0 L0 30" stroke="#b5903a" stroke-width="1.5"/>
+        </svg>
+    </div>
+
+    <!-- Content -->
+    <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:3.5rem 5rem;">
+
+        <!-- Header row -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:auto;">
+            <div style="display:flex;align-items:center;gap:.625rem;">
+                <div style="width:36px;height:36px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;"></span>
+                </div>
+                <div>
+                    <p style="font-family:'Syne',sans-serif;font-weight:800;font-size:.875rem;letter-spacing:-.01em;">Radical</p>
+                    <p style="font-size:.625rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;">Verified Credential</p>
+                </div>
+            </div>
+            <p style="font-size:.7rem;color:var(--muted);font-weight:300;">ID: <span th:text="${student.id} + '-' + ${course.id}">1-1</span></p>
+        </div>
+
+        <!-- Main content -->
+        <div style="text-align:center;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem 0;">
+            <p style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:1.5rem;">Certificate of Completion</p>
+
+            <p style="font-size:1rem;color:var(--muted);font-weight:300;margin-bottom:.625rem;">This certifies that</p>
+            <h1 style="font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(2.5rem,6vw,4.5rem);color:var(--ink);letter-spacing:-.02em;line-height:1;margin-bottom:1.25rem;" th:text="${student.name}">Student Name</h1>
+
+            <p style="font-size:.9375rem;color:var(--muted);font-weight:300;margin-bottom:1.25rem;">has successfully completed</p>
+
+            <div style="background:var(--ink);color:#fff;padding:.75rem 2.5rem;border-radius:4px;display:inline-block;margin-bottom:.5rem;">
+                <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,2.5vw,1.5rem);letter-spacing:-.02em;" th:text="${course.title}">Course Title</h2>
+            </div>
+        </div>
+
+        <!-- Footer row -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;padding-top:1.5rem;border-top:1px solid rgba(181,144,58,.25);">
+            <div>
+                <p style="font-family:'DM Serif Display',serif;font-style:italic;font-size:1.25rem;margin-bottom:.25rem;" th:text="${issueDate}">Date</p>
+                <p style="font-size:.625rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;">Date of completion</p>
+            </div>
+
+            <div style="text-align:center;">
+                <div style="width:48px;height:48px;border-radius:50%;background:rgba(181,144,58,.12);border:1.5px solid rgba(181,144,58,.3);display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;">
+                    <i class="fas fa-award" style="color:var(--gold);font-size:1.125rem;"></i>
+                </div>
+                <p style="font-size:.625rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;">Verified</p>
+            </div>
+
+            <div style="text-align:right;">
+                <p style="font-family:'DM Serif Display',serif;font-style:italic;font-size:1.25rem;margin-bottom:.25rem;" th:text="${course.instructor.name}">Instructor</p>
+                <p style="font-size:.625rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;">Lead Instructor</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

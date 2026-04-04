@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Player | Radical</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root{--ink:#0d0d0d;--paper:#f7f5f0;--accent:#e8401c;--teal:#0d9488;--muted:#7a7672;--border-c:rgba(13,13,13,.08);--border-s:#e5e2dc;}
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;background:#fff;color:var(--ink);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+        h1,h2,h3,.syne{font-family:'Syne',sans-serif;}
+
+        /* Nav */
+        .player-nav{height:56px;background:rgba(247,245,240,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-s);display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;flex-shrink:0;z-index:20;}
+
+        /* Layout */
+        .player-body{flex:1;display:flex;overflow:hidden;}
+
+        /* Sidebar */
+        #sidebar{width:300px;flex-shrink:0;background:var(--paper);border-right:1px solid var(--border-s);display:flex;flex-direction:column;overflow:hidden;}
+        .sidebar-header{padding:.875rem 1.25rem;border-bottom:1px solid var(--border-s);flex-shrink:0;}
+        .sidebar-header p{font-family:'Syne',sans-serif;font-weight:700;font-size:.8125rem;letter-spacing:.01em;}
+        .sidebar-scroll{overflow-y:auto;flex:1;}
+
+        .module-heading{padding:.6rem 1rem;background:rgba(13,13,13,.03);border-bottom:1px solid var(--border-s);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);position:sticky;top:0;z-index:5;}
+        .lesson-link{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid rgba(13,13,13,.04);text-decoration:none;color:var(--ink);font-size:.875rem;font-weight:400;transition:background .15s;}
+        .lesson-link:hover{background:rgba(13,13,13,.04);}
+        .lesson-link.active{background:rgba(13,148,136,.07);font-weight:600;border-left:3px solid var(--teal);}
+        .lesson-check{color:var(--teal);font-size:.75rem;}
+
+        /* Resizer */
+        #resizer{width:4px;background:var(--border-s);cursor:col-resize;flex-shrink:0;transition:background .2s;}
+        #resizer:hover{background:var(--teal);}
+
+        /* Content area */
+        #content-area{flex:1;overflow-y:auto;background:#fff;}
+        .content-inner{max-width:760px;margin:0 auto;padding:3rem 2.5rem 5rem;}
+
+        /* Article typography */
+        .article-body{font-size:1.0625rem;line-height:1.8;color:#1a1a1a;white-space:pre-wrap;font-family:'DM Sans',sans-serif;font-weight:300;}
+
+        /* Comments */
+        .comment{background:var(--paper);border:1px solid var(--border-s);border-radius:10px;padding:1rem 1.125rem;margin-bottom:.75rem;}
+        .comment.instructor-comment{background:#e6faf8;border-color:rgba(13,148,136,.2);}
+
+        /* Scrollbar */
+        ::-webkit-scrollbar{width:6px;}
+        ::-webkit-scrollbar-track{background:transparent;}
+        ::-webkit-scrollbar-thumb{background:var(--border-s);border-radius:3px;}
+        ::-webkit-scrollbar-thumb:hover{background:#ccc;}
+    </style>
+</head>
+<body>
+
+<nav class="player-nav">
+    <div style="display:flex;align-items:center;gap:.875rem;">
+        <a th:href="@{/student/dashboard}" href="#"
+           style="display:inline-flex;align-items:center;gap:.35rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-decoration:none;background:rgba(13,13,13,.06);border-radius:6px;padding:.375rem .75rem;transition:all .2s;"
+           onmouseover="this.style.background='rgba(13,13,13,.1)';this.style.color='var(--ink)'"
+           onmouseout="this.style.background='rgba(13,13,13,.06)';this.style.color='var(--muted)'">
+            <i class="fas fa-arrow-left" style="font-size:.65rem;"></i> Desk
+        </a>
+        <div style="width:1px;height:18px;background:var(--border-s);"></div>
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px;" th:text="${course.title}">Course</span>
+    </div>
+    <span style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;background:#e6faf8;color:var(--teal);padding:.25rem .625rem;border-radius:4px;">Reader</span>
+</nav>
+
+<div class="player-body">
+
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <p>Course content</p>
+        </div>
+        <div class="sidebar-scroll" th:if="${course != null and course.modules != null}">
+            <div th:each="courseModule : ${course.modules}">
+                <div class="module-heading" th:text="${courseModule.title}">Section</div>
+                <div th:if="${courseModule.lessons != null and not #lists.isEmpty(courseModule.lessons)}">
+                    <a th:each="courseLesson : ${courseModule.lessons}"
+                       th:href="@{'/student/courses/' + ${course.id} + '/play?lessonId=' + ${courseLesson.id}}"
+                       th:classappend="${currentLesson != null and currentLesson.id == courseLesson.id} ? ' active' : ''"
+                       class="lesson-link">
+                        <span th:text="${courseLesson.title}" style="flex:1;padding-right:.5rem;"></span>
+                        <i th:if="${completedLessons != null and #sets.contains(completedLessons, courseLesson)}" class="fas fa-check-circle lesson-check"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resizer"></div>
+
+    <div id="content-area">
+
+        <div th:if="${currentLesson == null}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:3rem;">
+            <div style="width:64px;height:64px;border-radius:50%;background:rgba(13,13,13,.04);display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--muted);margin:0 auto 1.25rem;">
+                <i class="fas fa-wrench"></i>
+            </div>
+            <h2 style="font-size:1.375rem;font-weight:700;letter-spacing:-.02em;margin-bottom:.5rem;">No lessons yet</h2>
+            <p style="font-size:.9375rem;color:var(--muted);font-weight:300;">The instructor hasn't uploaded any content yet.</p>
+        </div>
+
+        <div th:if="${currentLesson != null}" class="content-inner">
+
+            <div style="margin-bottom:2.5rem;padding-bottom:1.75rem;border-bottom:1px solid var(--border-s);">
+                <div style="display:flex;align-items:center;gap:.625rem;margin-bottom:1rem;">
+                    <span style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:.25rem .6rem;border-radius:4px;"
+                          th:style="${currentLesson.contentType == 'PDF'} ? 'background:#fff0ed;color:var(--accent);' : 'background:#edf4ff;color:#1c6ee8;'"
+                          th:text="${currentLesson.contentType}">Type</span>
+                    <a th:if="${currentLesson.contentType == 'PDF'}" th:href="@{${currentLesson.fileUrl}}" target="_blank"
+                       style="font-size:.8rem;color:var(--teal);text-decoration:none;font-weight:500;display:inline-flex;align-items:center;gap:.3rem;"
+                       onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                        <i class="fas fa-external-link-alt" style="font-size:.7rem;"></i> Open in new tab
+                    </a>
+                </div>
+                <h1 style="font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;letter-spacing:-.03em;line-height:1.15;" th:text="${currentLesson.title}">Lesson Title</h1>
+            </div>
+
+            <div th:if="${currentLesson.contentType == 'Text'}" class="article-body" th:text="${currentLesson.textContent}">Content</div>
+
+            <div th:if="${currentLesson.contentType == 'PDF'}" style="min-height:700px;display:flex;flex-direction:column;">
+                <iframe th:src="@{${currentLesson.fileUrl}}" style="width:100%;flex:1;min-height:700px;border:1px solid var(--border-s);border-radius:8px;" frameborder="0"></iframe>
+            </div>
+
+            <div style="margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border-s);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;">
+                <form th:action="@{'/student/courses/' + ${course.id} + '/lessons/' + ${currentLesson.id} + '/complete'}" method="POST" style="margin:0;">
+                    <button th:if="${completedLessons == null or !#sets.contains(completedLessons, currentLesson)}" type="submit"
+                            style="display:inline-flex;align-items:center;gap:.4rem;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:.7rem 1.5rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8125rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:background .2s;"
+                            onmouseover="this.style.background='#0a7d72'" onmouseout="this.style.background='var(--teal)'">
+                        <i class="fas fa-check" style="font-size:.75rem;"></i> Mark complete
+                    </button>
+                    <div th:if="${completedLessons != null and #sets.contains(completedLessons, currentLesson)}"
+                         style="display:inline-flex;align-items:center;gap:.4rem;background:#e6faf8;color:var(--teal);border-radius:8px;padding:.7rem 1.5rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8125rem;letter-spacing:.04em;text-transform:uppercase;">
+                        <i class="fas fa-check-circle"></i> Completed
+                    </div>
+                </form>
+                <span style="font-size:.8125rem;color:var(--muted);font-weight:300;">← Select next lesson from the sidebar</span>
+            </div>
+
+            <div style="margin-top:3.5rem;padding-top:2rem;border-top:1px solid var(--border-s);">
+                <h3 style="font-size:1.125rem;font-weight:700;letter-spacing:-.02em;margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;">
+                    <i class="fas fa-comments" style="font-size:1rem;color:var(--muted);"></i> Discussion
+                </h3>
+
+                <div style="margin-bottom:1.5rem;">
+                    <div th:if="${not #lists.isEmpty(currentLesson.comments)}">
+                        <div th:each="lessonComment : ${currentLesson.comments}"
+                             th:class="${lessonComment.author.role.name() == 'INSTRUCTOR'} ? 'comment instructor-comment' : 'comment'">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.625rem;">
+                                <div style="display:flex;align-items:center;gap:.5rem;">
+                                    <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.875rem;" th:text="${lessonComment.author.name}">Author</span>
+                                    <span th:if="${lessonComment.author.role.name() == 'INSTRUCTOR'}" style="font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;background:var(--teal);color:#fff;padding:.2rem .5rem;border-radius:3px;">Instructor</span>
+                                </div>
+                                <span style="font-size:.75rem;color:var(--muted);" th:text="${#temporals.format(lessonComment.createdAt, 'MMM dd, HH:mm')}">Time</span>
+                            </div>
+                            <p style="font-size:.9rem;line-height:1.7;font-weight:300;white-space:pre-wrap;" th:text="${lessonComment.content}">Message</p>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(currentLesson.comments)}" style="padding:1.5rem;text-align:center;border:1.5px dashed var(--border-s);border-radius:10px;">
+                        <p style="font-size:.875rem;color:var(--muted);font-weight:300;">No questions yet. Be the first to ask!</p>
+                    </div>
+                </div>
+
+                <form th:action="@{'/student/courses/' + ${course.id} + '/lessons/' + ${currentLesson.id} + '/comment'}" method="POST" style="background:var(--paper);border:1px solid var(--border-s);border-radius:12px;padding:1.25rem;">
+                    <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.625rem;color:var(--muted);">Ask a question</label>
+                    <textarea name="content" rows="3" required placeholder="Type your question or comment…"
+                              style="width:100%;background:#fff;border:1.5px solid var(--border-s);border-radius:8px;padding:.75rem 1rem;font-size:.9375rem;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;resize:vertical;margin-bottom:.875rem;transition:border-color .2s;"
+                              onfocus="this.style.borderColor='var(--teal)'"
+                              onblur="this.style.borderColor='var(--border-s)'"></textarea>
+                    <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:.4rem;background:var(--ink);color:#fff;border:none;border-radius:7px;padding:.55rem 1.125rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:background .2s;"
+                            onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='var(--ink)'">
+                        Post <i class="fas fa-paper-plane" style="font-size:.65rem;"></i>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const resizer = document.getElementById('resizer');
+    let dragging = false;
+
+    resizer.addEventListener('mousedown', e => {
+        dragging = true;
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+    });
+    document.addEventListener('mousemove', e => {
+        if (!dragging) return;
+        let w = Math.max(200, Math.min(e.clientX, window.innerWidth * 0.5));
+        sidebar.style.width = w + 'px';
+    });
+    document.addEventListener('mouseup', () => {
+        dragging = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+    });
+</script>
+</body>
+</html>

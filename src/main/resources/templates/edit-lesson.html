@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Lesson | Radical</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root{--ink:#0d0d0d;--paper:#f7f5f0;--accent:#e8401c;--teal:#0d9488;--muted:#7a7672;--border-s:#e5e2dc;}
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;padding:2.5rem 2rem;display:flex;justify-content:center;align-items:flex-start;}
+        h1,h2,.syne{font-family:'Syne',sans-serif;}
+        body::after{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+        .wrap{width:100%;max-width:680px;}
+        .card{background:#fff;border:1px solid rgba(13,13,13,.1);border-radius:16px;padding:2.5rem;box-shadow:0 16px 48px rgba(0,0,0,.06);}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <a th:href="@{'/instructor/courses/' + ${course.id} + '/modules'}" href="#" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.8125rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:1.75rem;transition:color .2s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--muted)'">
+        <i class="fas fa-arrow-left" style="font-size:.7rem;"></i> Cancel edit
+    </a>
+
+    <div class="card">
+        <p style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem;"><span style="width:16px;height:1.5px;background:var(--muted);display:inline-block;"></span>Module: <span th:text="${module.title}" style="text-transform:none;font-weight:400;">Module</span></p>
+        <h1 style="font-size:1.625rem;font-weight:800;letter-spacing:-.03em;margin-bottom:2rem;">Edit Lesson</h1>
+
+        <form th:action="@{'/instructor/courses/' + ${course.id} + '/modules/' + ${module.id} + '/lessons/' + ${lesson.id} + '/edit'}" th:object="${lesson}" method="POST" style="display:flex;flex-direction:column;gap:1.25rem;">
+
+            <div>
+                <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;">Lesson title</label>
+                <input type="text" th:field="*{title}" required
+                       style="width:100%;background:#fff;border:1.5px solid var(--border-s);border-radius:8px;padding:.75rem 1rem;font-size:.9375rem;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;"
+                       onfocus="this.style.borderColor='var(--teal)';this.style.boxShadow='0 0 0 3px rgba(13,148,136,.1)'"
+                       onblur="this.style.borderColor='var(--border-s)';this.style.boxShadow='none'">
+            </div>
+
+            <div>
+                <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;">Content type</label>
+                <select id="contentType" th:field="*{contentType}"
+                        style="width:100%;background:#fff;border:1.5px solid var(--border-s);border-radius:8px;padding:.75rem 1rem;font-size:.9375rem;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;appearance:none;background-image:url(&quot;data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a7672' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e&quot;);background-repeat:no-repeat;background-position:right .875rem center;background-size:1em;cursor:pointer;transition:border-color .2s;"
+                        onfocus="this.style.borderColor='var(--teal)'"
+                        onblur="this.style.borderColor='var(--border-s)'">
+                    <option value="Text">Text Article</option>
+                    <option value="PDF">PDF Document</option>
+                </select>
+            </div>
+
+            <div id="textSection" th:style="${lesson.contentType == 'Text'} ? 'display:block;' : 'display:none;'">
+                <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;">Article content</label>
+                <textarea th:field="*{textContent}" rows="10" placeholder="Write your lesson content here…"
+                          style="width:100%;background:#fff;border:1.5px solid var(--border-s);border-radius:8px;padding:.75rem 1rem;font-size:.9375rem;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;resize:vertical;line-height:1.65;transition:border-color .2s,box-shadow .2s;"
+                          onfocus="this.style.borderColor='var(--teal)';this.style.boxShadow='0 0 0 3px rgba(13,148,136,.1)'"
+                          onblur="this.style.borderColor='var(--border-s)';this.style.boxShadow='none'"></textarea>
+            </div>
+
+            <div id="pdfSection" th:style="${lesson.contentType == 'PDF'} ? 'display:block;' : 'display:none;'">
+                <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;">PDF file URL</label>
+                <input type="text" th:field="*{fileUrl}" placeholder="https://example.com/file.pdf"
+                       style="width:100%;background:#fff;border:1.5px solid var(--border-s);border-radius:8px;padding:.75rem 1rem;font-size:.9375rem;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;"
+                       onfocus="this.style.borderColor='var(--teal)';this.style.boxShadow='0 0 0 3px rgba(13,148,136,.1)'"
+                       onblur="this.style.borderColor='var(--border-s)';this.style.boxShadow='none'">
+            </div>
+
+            <button type="submit"
+                    style="width:100%;background:var(--ink);color:#fff;border:none;border-radius:8px;padding:.9rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.9375rem;letter-spacing:.02em;cursor:pointer;transition:background .2s;margin-top:.25rem;"
+                    onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='var(--ink)'">
+                Update Lesson
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const sel = document.getElementById('contentType');
+    const txt = document.getElementById('textSection');
+    const pdf = document.getElementById('pdfSection');
+    sel.addEventListener('change', function() {
+        txt.style.display = this.value === 'Text' ? 'block' : 'none';
+        pdf.style.display = this.value === 'PDF' ? 'block' : 'none';
+    });
+</script>
+</body>
+</html>

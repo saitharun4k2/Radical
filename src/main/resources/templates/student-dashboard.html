@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Desk | Radical</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root{--ink:#0d0d0d;--paper:#f7f5f0;--accent:#e8401c;--teal:#0d9488;--muted:#7a7672;--border-c:rgba(13,13,13,.1);--border-s:#e5e2dc;}
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+        h1,h2,h3,.syne{font-family:'Syne',sans-serif;}
+        body::after{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+        nav{position:sticky;top:0;z-index:100;background:rgba(247,245,240,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-c);padding:0 2rem;}
+        .nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px;gap:1rem;}
+        main{max-width:1280px;margin:0 auto;padding:3rem 2rem 5rem;width:100%;flex:1;}
+
+        .course-card{background:#fff;border:1px solid var(--border-c);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .25s,transform .25s;}
+        .course-card:hover{box-shadow:0 20px 56px rgba(0,0,0,.09);transform:translateY(-3px);}
+        .course-card-top{padding:1.5rem 1.5rem 1.25rem;flex:1;}
+        .course-card-bottom{padding:1rem 1.5rem;background:rgba(13,13,13,.025);border-top:1px solid var(--border-c);}
+
+        .progress-bar-track{width:100%;height:6px;background:rgba(13,13,13,.08);border-radius:100px;overflow:hidden;margin-top:.5rem;}
+        .progress-bar-fill{height:100%;background:var(--teal);border-radius:100px;transition:width .5s ease;}
+
+
+        .search-modal{position:fixed;inset:0;background:rgba(13,13,13,.6);backdrop-filter:blur(8px);z-index:200;display:none;flex-direction:column;align-items:center;padding-top:8rem;}
+        .search-modal.open{display:flex;}
+        .search-box{background:#fff;border-radius:16px;width:100%;max-width:560px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.2);}
+        .search-input-row{display:flex;align-items:center;gap:.875rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border-s);}
+        .search-input{flex:1;border:none;outline:none;font-size:1.0625rem;font-family:'DM Sans',sans-serif;color:var(--ink);background:transparent;}
+        .search-input::placeholder{color:#bbb;}
+        .search-results{max-height:360px;overflow-y:auto;}
+        .search-result-item{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;text-decoration:none;color:var(--ink);transition:background .15s;border-bottom:1px solid var(--border-s);}
+        .search-result-item:hover{background:var(--paper);}
+
+        .empty-state{text-align:center;padding:4rem 2rem;border:1.5px dashed var(--border-s);border-radius:16px;}
+    </style>
+</head>
+<body>
+
+<!-- Search Modal -->
+<div id="searchModal" class="search-modal" onclick="if(event.target===this)closeSearch()">
+    <div class="search-box">
+        <div class="search-input-row">
+            <i class="fas fa-search" style="color:var(--muted);font-size:.875rem;"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search the library..." autocomplete="off">
+            <button onclick="closeSearch()" style="font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:rgba(13,13,13,.06);border:none;border-radius:4px;padding:.25rem .5rem;cursor:pointer;">Esc</button>
+        </div>
+        <div id="searchResults" class="search-results">
+            <div style="padding:2rem;text-align:center;color:var(--muted);font-size:.875rem;">Start typing to search…</div>
+        </div>
+    </div>
+</div>
+
+<nav>
+    <div class="nav-inner">
+        <div style="display:flex;align-items:center;gap:1rem;">
+            <a th:href="@{/}" href="#" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.125rem;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:.35rem;">
+                <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;margin-bottom:1px;"></span>Radical
+            </a>
+        </div>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+            <!-- Search trigger -->
+            <button onclick="openSearch()" style="display:flex;align-items:center;gap:.625rem;background:rgba(13,13,13,.05);border:1px solid var(--border-s);border-radius:8px;padding:.45rem .875rem;cursor:pointer;transition:background .2s;" onmouseover="this.style.background='rgba(13,13,13,.09)'" onmouseout="this.style.background='rgba(13,13,13,.05)'">
+                <i class="fas fa-search" style="font-size:.75rem;color:var(--muted);"></i>
+                <span style="font-size:.8125rem;color:var(--muted);font-weight:400;">Search library</span>
+                <span style="font-size:.65rem;font-weight:600;color:var(--muted);background:#fff;border:1px solid var(--border-s);border-radius:4px;padding:.15rem .4rem;">⌘K</span>
+            </button>
+            <a th:href="@{/}" href="#" style="font-size:.8125rem;font-weight:500;color:var(--muted);text-decoration:none;padding:.4rem .75rem;border-radius:6px;transition:background .2s,color .2s;" onmouseover="this.style.background='rgba(13,13,13,.06)';this.style.color='var(--ink)'" onmouseout="this.style.background='transparent';this.style.color='var(--muted)'">Library</a>
+            <div style="display:flex;align-items:center;gap:.5rem;padding:.3rem .75rem;background:rgba(13,13,13,.05);border-radius:6px;">
+                <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8125rem;" th:text="${student.name}">Student</span>
+            </div>
+            <form th:action="@{/logout}" method="post" style="margin:0;">
+                <button type="submit" style="background:transparent;border:1.5px solid var(--border-s);border-radius:6px;padding:.4rem .875rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;color:var(--muted);cursor:pointer;transition:all .2s;"
+                        onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'"
+                        onmouseout="this.style.borderColor='var(--border-s)';this.style.color='var(--muted)'">Sign out</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <!-- Welcome banner -->
+    <div style="background:var(--ink);border-radius:16px;padding:2.5rem;margin-bottom:3rem;position:relative;overflow:hidden;">
+        <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(232,64,28,.15);bottom:-100px;right:-60px;pointer-events:none;"></div>
+        <p style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.5rem;">Your workspace</p>
+        <h1 style="font-size:clamp(1.5rem,2.5vw,2.25rem);font-weight:800;letter-spacing:-.03em;color:#fff;line-height:1.15;position:relative;z-index:1;">
+            Welcome back, <span th:text="${student.name}" style="color:var(--accent);">Builder</span>.
+        </h1>
+        <p style="font-size:.9375rem;color:rgba(255,255,255,.5);margin-top:.5rem;font-weight:300;position:relative;z-index:1;">What are we learning today?</p>
+    </div>
+
+    <!-- My Desk -->
+    <div style="margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+            <p style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem;display:flex;align-items:center;gap:.4rem;"><span style="width:16px;height:1.5px;background:var(--muted);display:inline-block;"></span>In progress</p>
+            <h2 style="font-size:1.375rem;font-weight:800;letter-spacing:-.03em;">My Desk</h2>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(enrolledCourses)}" class="empty-state" style="margin-bottom:3rem;">
+        <div style="width:52px;height:52px;border-radius:50%;background:rgba(13,13,13,.04);display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:var(--muted);margin:0 auto .875rem;">
+            <i class="fas fa-inbox"></i>
+        </div>
+        <h3 style="font-size:1.125rem;font-weight:700;letter-spacing:-.02em;margin-bottom:.4rem;">Your desk is empty</h3>
+        <p style="font-size:.875rem;color:var(--muted);font-weight:300;">Browse the library below and add courses to get started.</p>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(enrolledCourses)}" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;margin-bottom:3rem;">
+        <div th:each="course:${enrolledCourses}" class="course-card">
+            <div class="course-card-top">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.125rem;">
+                    <span style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:.25rem .6rem;border-radius:4px;background:rgba(13,13,13,.06);color:var(--ink);" th:text="${course.category.name}">Dev</span>
+                    <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.875rem;color:var(--teal);" th:text="${courseProgress.get(course.id)} + '%'">0%</span>
+                </div>
+                <h3 style="font-size:1.0625rem;font-weight:700;letter-spacing:-.02em;line-height:1.35;margin-bottom:.5rem;" th:text="${course.title}">Course Title</h3>
+                <p style="font-size:.8125rem;color:var(--muted);line-height:1.6;font-weight:300;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;" th:text="${course.description}">Description</p>
+                <!-- Progress -->
+                <div style="margin-top:1.25rem;">
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" th:style="'width:' + ${courseProgress.get(course.id)} + '%'"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="course-card-bottom">
+                <!-- In progress: resume -->
+                <a th:if="${courseProgress.get(course.id) < 100}" th:href="@{/student/courses/{id}/play(id=${course.id})}" href="#"
+                   style="display:flex;align-items:center;justify-content:center;gap:.4rem;background:var(--ink);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;padding:.6rem 1rem;border-radius:7px;transition:background .2s;"
+                   onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='var(--ink)'">
+                    Resume <i class="fas fa-arrow-right" style="font-size:.65rem;"></i>
+                </a>
+                <!-- Completed: three actions -->
+                <div th:if="${courseProgress.get(course.id) == 100}" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;">
+                    <a th:href="@{/student/courses/{id}/play(id=${course.id})}" href="#"
+                       style="display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:.6rem .5rem;border-radius:7px;background:rgba(13,13,13,.05);color:var(--ink);font-family:'Syne',sans-serif;font-weight:700;font-size:.65rem;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;transition:background .2s;"
+                       onmouseover="this.style.background='rgba(13,13,13,.1)'" onmouseout="this.style.background='rgba(13,13,13,.05)'">
+                        <i class="fas fa-book-open" style="font-size:.875rem;"></i> Review
+                    </a>
+                    <a th:href="@{/student/courses/{id}/certificate(id=${course.id})}" href="#"
+                       style="display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:.6rem .5rem;border-radius:7px;background:#fef9c3;color:#854d0e;font-family:'Syne',sans-serif;font-weight:700;font-size:.65rem;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;transition:background .2s;">
+                        <i class="fas fa-award" style="font-size:.875rem;"></i> Certificate
+                    </a>
+                    <a th:href="@{/student/courses/{id}/rate(id=${course.id})}" href="#"
+                       style="display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:.6rem .5rem;border-radius:7px;background:#e6faf8;color:var(--teal);font-family:'Syne',sans-serif;font-weight:700;font-size:.65rem;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;transition:background .2s;">
+                        <i class="fas fa-star" style="font-size:.875rem;"></i> Rate
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Explore Library -->
+    <div style="margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--border-s);">
+        <div>
+            <p style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem;display:flex;align-items:center;gap:.4rem;"><span style="width:16px;height:1.5px;background:var(--muted);display:inline-block;"></span>Explore</p>
+            <h2 style="font-size:1.375rem;font-weight:800;letter-spacing:-.03em;">Library</h2>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(availableCourses)}" class="empty-state">
+        <div style="width:52px;height:52px;border-radius:50%;background:rgba(13,148,136,.1);display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:var(--teal);margin:0 auto .875rem;">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <h3 style="font-size:1.125rem;font-weight:700;margin-bottom:.4rem;">You're all caught up!</h3>
+        <p style="font-size:.875rem;color:var(--muted);font-weight:300;">You've enrolled in everything we offer. Check back for new content.</p>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(availableCourses)}" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;">
+        <div th:each="course:${availableCourses}" class="course-card" style="opacity:.95;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.95'">
+            <div class="course-card-top">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.125rem;">
+                    <span style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:.25rem .6rem;border-radius:4px;background:rgba(13,13,13,.06);color:var(--ink);" th:text="${course.category.name}">Dev</span>
+                    <div style="display:flex;gap:.35rem;align-items:center;">
+                        <span th:if="${course.averageRating > 0}" style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:.25rem .5rem;border-radius:4px;background:#fef9c3;color:#854d0e;">
+                            <i class="fas fa-star" style="font-size:.55rem;"></i> <span th:text="${course.averageRating}">4.5</span>
+                        </span>
+                        <span style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:.25rem .5rem;border-radius:4px;background:#e6faf8;color:var(--teal);">
+                            <i class="fas fa-file-pdf"></i> + Text
+                        </span>
+                    </div>
+                </div>
+                <h3 style="font-size:1.0625rem;font-weight:700;letter-spacing:-.02em;line-height:1.35;margin-bottom:.5rem;" th:text="${course.title}">Course</h3>
+                <p style="font-size:.8125rem;color:var(--muted);line-height:1.6;font-weight:300;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;" th:text="${course.description}">Description</p>
+            </div>
+            <div class="course-card-bottom" style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.875rem;color:var(--teal);text-transform:uppercase;letter-spacing:.04em;">Free</span>
+                <form th:action="@{/student/enroll/{id}(id=${course.id})}" method="POST" style="margin:0;">
+                    <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:.4rem;background:var(--ink);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;border:none;padding:.55rem 1rem;border-radius:7px;cursor:pointer;transition:background .2s;"
+                            onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='var(--ink)'">
+                        Add to desk <i class="fas fa-plus" style="font-size:.65rem;"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer style="border-top:1px solid var(--border-s);padding:1.5rem 2rem;text-align:center;">
+    <p style="font-size:.75rem;color:var(--muted);font-weight:300;">&copy; 2026 Radical Systems Inc. All rights reserved.</p>
+</footer>
+
+<script>
+    const modal = document.getElementById('searchModal');
+    const input = document.getElementById('searchInput');
+    const results = document.getElementById('searchResults');
+
+    document.addEventListener('keydown', e => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+        if (e.key === 'Escape') closeSearch();
+    });
+    function openSearch() { modal.classList.add('open'); setTimeout(()=>input.focus(),50); }
+    function closeSearch() { modal.classList.remove('open'); input.value=''; results.innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:.875rem;">Start typing to search…</div>'; }
+
+    let timer;
+    input.addEventListener('input', e => {
+        clearTimeout(timer);
+        const q = e.target.value.trim();
+        if(q.length < 2) { results.innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:.875rem;">Start typing to search…</div>'; return; }
+        results.innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:.875rem;">Searching…</div>';
+        timer = setTimeout(() => {
+            fetch(`/student/api/search?query=${encodeURIComponent(q)}`)
+                .then(r=>r.json())
+                .then(data => {
+                    if(!data.length) { results.innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:.875rem;">No results found.</div>'; return; }
+                    results.innerHTML = data.map(c=>`
+                        <a href="/student/courses/${c.id}/play" class="search-result-item">
+                            <div style="display:flex;align-items:center;gap:.75rem;">
+                                <span style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:.2rem .5rem;border-radius:4px;background:rgba(13,13,13,.06);color:var(--ink);">${c.category}</span>
+                                <span style="font-size:.9375rem;font-weight:500;">${c.title}</span>
+                            </div>
+                            <i class="fas fa-arrow-right" style="font-size:.7rem;color:var(--muted);"></i>
+                        </a>`).join('');
+                });
+        }, 300);
+    });
+</script>
+</body>
+</html>

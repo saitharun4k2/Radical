@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Instructor | Radical Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root{--ink:#0d0d0d;--paper:#f7f5f0;--accent:#e8401c;--purple:#7c3aed;--muted:#7a7672;--border-s:#e5e2dc;}
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
+        h1,h2,.syne{font-family:'Syne',sans-serif;}
+        body::after{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+        .card{background:#fff;border:1px solid rgba(13,13,13,.1);border-radius:16px;padding:2.5rem;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.06);}
+    </style>
+</head>
+<body>
+<div class="card">
+    <a th:href="@{/admin/dashboard}" href="#" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.8125rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:2rem;transition:color .2s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--muted)'">
+        <i class="fas fa-arrow-left" style="font-size:.7rem;"></i> Back to dashboard
+    </a>
+
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.625rem;">
+        <div style="width:40px;height:40px;border-radius:10px;background:#f3f0ff;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-chalkboard-teacher" style="color:var(--purple);font-size:.9rem;"></i>
+        </div>
+        <h1 style="font-size:1.5rem;font-weight:800;letter-spacing:-.03em;">Create Instructor</h1>
+    </div>
+    <p style="font-size:.875rem;color:var(--muted);font-weight:300;margin-bottom:2rem;line-height:1.6;">Grant teaching privileges to a new user. They bypass standard student registration.</p>
+
+    <form th:action="@{/admin/create-instructor}" th:object="${instructor}" method="POST" style="display:flex;flex-direction:column;gap:1.125rem;">
+        <div>
+            <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;">Full name</label>
+            <input type="text" th:field="*{name}" placeholder="John Doe"
+                   style="width:100%;background:#fff;border:1.5px solid var(--border-s);border-radius:8px;padding:.75rem 1rem;font-size:.9375rem;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;"
+                   onfocus="this.style.borderColor='var(--purple)';this.style.boxShadow='0 0 0 3px rgba(124,58,237,.1)'"
+                   onblur="this.style.borderColor='var(--border-s)';this.style.boxShadow='none'">
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="font-size:.8rem;color:var(--accent);margin-top:.35rem;"></p>
+        </div>
+        <div>
+            <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;">Email address</label>
+            <input type="email" th:field="*{email}" placeholder="instructor@radical.com"
+                   style="width:100%;background:#fff;border:1.5px solid var(--border-s);border-radius:8px;padding:.75rem 1rem;font-size:.9375rem;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;"
+                   onfocus="this.style.borderColor='var(--purple)';this.style.boxShadow='0 0 0 3px rgba(124,58,237,.1)'"
+                   onblur="this.style.borderColor='var(--border-s)';this.style.boxShadow='none'">
+            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="font-size:.8rem;color:var(--accent);margin-top:.35rem;"></p>
+        </div>
+        <div>
+            <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;">Temporary password</label>
+            <input type="password" th:field="*{password}" placeholder="••••••••"
+                   style="width:100%;background:#fff;border:1.5px solid var(--border-s);border-radius:8px;padding:.75rem 1rem;font-size:.9375rem;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;"
+                   onfocus="this.style.borderColor='var(--purple)';this.style.boxShadow='0 0 0 3px rgba(124,58,237,.1)'"
+                   onblur="this.style.borderColor='var(--border-s)';this.style.boxShadow='none'">
+            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="font-size:.8rem;color:var(--accent);margin-top:.35rem;"></p>
+        </div>
+        <div style="display:flex;gap:.75rem;margin-top:.5rem;">
+            <a th:href="@{/admin/dashboard}" href="#"
+               style="flex:1;display:flex;align-items:center;justify-content:center;background:rgba(13,13,13,.05);color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;font-size:.8125rem;letter-spacing:.03em;text-decoration:none;border-radius:8px;padding:.75rem;transition:all .2s;"
+               onmouseover="this.style.background='rgba(13,13,13,.1)';this.style.color='var(--ink)'"
+               onmouseout="this.style.background='rgba(13,13,13,.05)';this.style.color='var(--muted)'">Cancel</a>
+            <button type="submit"
+                    style="flex:2;background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:.75rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8125rem;letter-spacing:.03em;cursor:pointer;transition:background .2s;"
+                    onmouseover="this.style.background='#6d28d9'" onmouseout="this.style.background='#7c3aed'">
+                Authorize Instructor &rarr;
+            </button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

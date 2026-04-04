@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Radical</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root{--ink:#0d0d0d;--paper:#f7f5f0;--accent:#e8401c;--purple:#7c3aed;--muted:#7a7672;--border-c:rgba(13,13,13,.1);--border-s:#e5e2dc;}
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);}
+        h1,h2,h3,.syne{font-family:'Syne',sans-serif;}
+        body::after{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+        nav{position:sticky;top:0;z-index:100;background:rgba(247,245,240,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-c);padding:0 2rem;}
+        .nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px;gap:1.5rem;}
+        main{max-width:1280px;margin:0 auto;padding:3rem 2rem 5rem;}
+        .stat-card{background:#fff;border:1px solid var(--border-c);border-radius:14px;padding:1.5rem;}
+        .action-card{background:#fff;border:1px solid var(--border-c);border-radius:14px;padding:1.75rem;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s;}
+        .action-card:hover{box-shadow:0 16px 48px rgba(0,0,0,.08);transform:translateY(-2px);}
+        @media(max-width:768px){nav{padding:0 1rem;}}
+    </style>
+    <script>window.addEventListener('pageshow',e=>{if(e.persisted)window.location.reload();});</script>
+</head>
+<body>
+
+<nav>
+    <div class="nav-inner">
+        <div style="display:flex;align-items:center;gap:1.5rem;">
+            <a th:href="@{/}" href="#" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.125rem;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:.35rem;">
+                <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;margin-bottom:1px;"></span>Radical
+            </a>
+            <span style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;background:#fff0ed;color:var(--accent);padding:.25rem .6rem;border-radius:4px;">Admin</span>
+        </div>
+        <div style="display:flex;gap:2rem;" class="hidden-mobile">
+            <a th:href="@{/admin/dashboard}" href="#" style="font-size:.875rem;font-weight:500;color:var(--ink);text-decoration:none;border-bottom:2px solid var(--accent);padding-bottom:2px;">Overview</a>
+            <a href="#" style="font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none;">Users</a>
+            <a href="#" style="font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none;">Courses</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+            <div style="display:flex;align-items:center;gap:.5rem;">
+                <div style="width:30px;height:30px;border-radius:50%;background:rgba(124,58,237,.12);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-user-shield" style="font-size:.75rem;color:var(--purple);"></i>
+                </div>
+                <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8125rem;" th:text="${user.name}">Admin</span>
+            </div>
+            <form th:action="@{/logout}" method="POST" style="margin:0;">
+                <button type="submit" style="background:transparent;border:1.5px solid var(--border-s);border-radius:6px;padding:.4rem .875rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.02em;color:var(--muted);cursor:pointer;transition:all .2s;"
+                        onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'"
+                        onmouseout="this.style.borderColor='var(--border-s)';this.style.color='var(--muted)'">
+                    Sign out
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <!-- Header -->
+    <div style="margin-bottom:3rem;">
+        <p style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;">System overview</p>
+        <h1 style="font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;">
+            Welcome back, <span th:text="${user.name}" style="color:var(--accent);">Commander</span>.
+        </h1>
+    </div>
+
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:3rem;">
+        <div class="stat-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
+                <div style="width:38px;height:38px;border-radius:8px;background:#f3f0ff;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-users" style="color:var(--purple);font-size:.875rem;"></i>
+                </div>
+                <span style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);">Students</span>
+            </div>
+            <p style="font-family:'Syne',sans-serif;font-size:2.25rem;font-weight:800;letter-spacing:-.04em;" th:text="${totalStudents}">500</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:.25rem;font-weight:300;">Total registered</p>
+        </div>
+        <div class="stat-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
+                <div style="width:38px;height:38px;border-radius:8px;background:#fff0ed;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-chalkboard-teacher" style="color:var(--accent);font-size:.875rem;"></i>
+                </div>
+                <span style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);">Instructors</span>
+            </div>
+            <p style="font-family:'Syne',sans-serif;font-size:2.25rem;font-weight:800;letter-spacing:-.04em;" th:text="${totalInstructors}">25</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:.25rem;font-weight:300;">Active creators</p>
+        </div>
+        <div class="stat-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
+                <div style="width:38px;height:38px;border-radius:8px;background:#edf4ff;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-layer-group" style="color:#1c6ee8;font-size:.875rem;"></i>
+                </div>
+                <span style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);">Courses</span>
+            </div>
+            <p style="font-family:'Syne',sans-serif;font-size:2.25rem;font-weight:800;letter-spacing:-.04em;" th:text="${totalCourses}">40</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:.25rem;font-weight:300;">Published on platform</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="margin-bottom:2rem;">
+        <p style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.625rem;display:flex;align-items:center;gap:.5rem;">
+            <span style="width:16px;height:1.5px;background:var(--muted);display:inline-block;"></span> Quick actions
+        </p>
+        <h2 style="font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:1.75rem;">Admin tools</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;">
+
+        <div class="action-card">
+            <div style="width:42px;height:42px;border-radius:10px;background:#fef9c3;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;">
+                <i class="fas fa-user-edit" style="color:#854d0e;"></i>
+            </div>
+            <h3 style="font-size:1rem;font-weight:700;letter-spacing:-.01em;margin-bottom:.5rem;">User Management</h3>
+            <p style="font-size:.875rem;color:var(--muted);line-height:1.65;font-weight:300;flex:1;margin-bottom:1.5rem;">Promote users to instructors, suspend accounts, and keep the platform community clean.</p>
+            <a href="#" style="display:inline-flex;align-items:center;gap:.4rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);text-decoration:none;border-bottom:2px solid var(--ink);padding-bottom:1px;transition:color .2s;">
+                Manage users <i class="fas fa-arrow-right" style="font-size:.65rem;"></i>
+            </a>
+        </div>
+
+        <div class="action-card">
+            <div style="width:42px;height:42px;border-radius:10px;background:#fce7f3;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;">
+                <i class="fas fa-tasks" style="color:#9d174d;"></i>
+            </div>
+            <h3 style="font-size:1rem;font-weight:700;letter-spacing:-.01em;margin-bottom:.5rem;">Course Moderation</h3>
+            <p style="font-size:.875rem;color:var(--muted);line-height:1.65;font-weight:300;flex:1;margin-bottom:1.5rem;">Review instructor submissions, approve quality content, and reject spam before it reaches learners.</p>
+            <a href="#" style="display:inline-flex;align-items:center;gap:.4rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);text-decoration:none;border-bottom:2px solid var(--ink);padding-bottom:1px;transition:color .2s;">
+                Review courses <i class="fas fa-arrow-right" style="font-size:.65rem;"></i>
+            </a>
+        </div>
+
+        <div class="action-card">
+            <div style="width:42px;height:42px;border-radius:10px;background:#f3f0ff;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;">
+                <i class="fas fa-chalkboard-teacher" style="color:var(--purple);"></i>
+            </div>
+            <h3 style="font-size:1rem;font-weight:700;letter-spacing:-.01em;margin-bottom:.5rem;">Create Instructor</h3>
+            <p style="font-size:.875rem;color:var(--muted);line-height:1.65;font-weight:300;flex:1;margin-bottom:1.5rem;">Manually provision an instructor account that bypasses the standard student registration flow.</p>
+            <a th:href="@{/admin/create-instructor}" href="#" style="display:inline-flex;align-items:center;gap:.4rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);text-decoration:none;border-bottom:2px solid var(--ink);padding-bottom:1px;">
+                Create instructor <i class="fas fa-arrow-right" style="font-size:.65rem;"></i>
+            </a>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>
