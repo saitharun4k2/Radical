@@ -397,7 +397,6 @@
 </head>
 <body>
 
-<!-- ── NAV ── -->
 <nav>
     <div class="nav-inner">
         <a th:href="@{/}" href="#" class="logo">
@@ -425,7 +424,6 @@
     </div>
 </nav>
 
-<!-- ── HERO ── -->
 <section class="hero">
     <div>
         <p class="hero-eyebrow fade-up">The Knowledge Library</p>
@@ -458,7 +456,13 @@
     </div>
 
     <div class="hero-visual fade-up delay-2">
-        <!-- PDF Card -->
+
+        <div class="card-float" style="width: 300px; top: -30px; right: 0px; z-index: 10; text-align: center; transform: rotate(1deg);">
+            <h3 style="font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.15rem; color: var(--ink); margin-bottom: 0.5rem;">Are you an expert in your field?</h3>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.5;">Join our platform and start teaching thousands of students today.</p>
+            <a th:href="@{/apply-instructor}" class="btn btn-primary" style="width: 100%; justify-content: center;">Wanna be an Instructor?</a>
+        </div>
+
         <div class="card-float card-pdf">
             <div class="card-tag">PDF Download</div>
             <div class="card-icon-wrap" style="background: #fff0ed;">
@@ -468,7 +472,6 @@
             <div class="card-sub">8-page deep reference · 2.4 MB</div>
         </div>
 
-        <!-- Article Card -->
         <div class="card-float card-article">
             <div class="card-tag">Text Article</div>
             <div class="card-icon-wrap" style="background: #edf4ff;">
@@ -478,7 +481,6 @@
             <div class="card-sub">12 min read · Intermediate</div>
         </div>
 
-        <!-- Badge -->
         <div class="card-float card-badge" style="background: #f0fdf9; border-color: rgba(13,148,136,0.2);">
             <i class="fas fa-check-circle" style="color: #0d9488; font-size: 1.75rem; margin-bottom: 0.5rem; display: block;"></i>
             <div style="font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: #0d9488;">Free</div>
@@ -487,7 +489,6 @@
     </div>
 </section>
 
-<!-- ── TICKER ── -->
 <div class="ticker">
     <div class="ticker-track">
         <span class="ticker-item"><span class="ticker-sep">◆</span> Premium PDF Guides</span>
@@ -505,7 +506,6 @@
     </div>
 </div>
 
-<!-- ── WHY RADICAL ── -->
 <div class="features">
     <div class="features-inner">
         <p class="section-eyebrow" style="color: rgba(255,255,255,0.4);">Why Radical</p>
@@ -538,7 +538,6 @@
     </div>
 </div>
 
-<!-- ── LIBRARY ── -->
 <section id="tracks">
     <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem 6rem;">
         <div class="library-header">
@@ -551,14 +550,12 @@
             </p>
         </div>
 
-        <!-- Empty State -->
         <div th:if="${#lists.isEmpty(courses)}" class="empty-state">
             <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
             <h3>Library Coming Soon</h3>
             <p>Our instructors are crafting new guides and PDFs. Check back shortly.</p>
         </div>
 
-        <!-- Course Grid -->
         <div th:if="${not #lists.isEmpty(courses)}" class="course-grid">
             <div th:each="course : ${courses}" class="course-card">
                 <div class="course-card-top">
@@ -596,7 +593,6 @@
     </div>
 </section>
 
-<!-- ── FOOTER ── -->
 <footer id="contact">
     <div class="footer-inner">
         <a href="#" class="footer-logo">Radical<span style="color: var(--accent);">.</span></a>

@@ -29,7 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/home", "/register", "/login", "/verify-otp", "/validate-otp", "/forgot-password", "/reset-password-otp", "/reset-password", "/css/**", "/js/**", "/access-denied", "/uploads/**", "/error").permitAll()
+                        .requestMatchers("/", "/home", "/register", "/login", "/verify-otp", "/validate-otp", "/forgot-password", "/reset-password-otp", "/reset-password", "/css/**", "/js/**", "/access-denied", "/uploads/**", "/error", "/apply-instructor").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/instructor/**").hasAuthority("ROLE_INSTRUCTOR")
                         .requestMatchers("/student/**").hasAuthority("ROLE_STUDENT")

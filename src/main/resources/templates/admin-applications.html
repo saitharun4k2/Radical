@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pending Applications | Radical Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0d0d0d;
+            --paper: #f7f5f0;
+            --accent: #e8401c;
+            --purple: #7c3aed;
+            --muted: #7a7672;
+            --border-s: #e5e2dc;
+            --card-bg: #ffffff;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 4rem 2rem;
+        }
+
+        h1, h2, th, .syne { font-family: 'Syne', sans-serif; }
+
+        /* Grain Overlay */
+        body::after {
+            content: '';
+            position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: .02;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .table-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(13,13,13,.1);
+            border-radius: 16px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 1100px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.06);
+        }
+
+        /* Table Styling */
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 700;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--muted);
+            border-bottom: 2px solid var(--border-s);
+        }
+
+        td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border-s);
+            font-size: 0.9375rem;
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        .td-bio {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--muted);
+            font-weight: 300;
+        }
+
+        /* Buttons */
+        .btn-resume {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: rgba(13,13,13,.04); color: var(--ink);
+            padding: 0.5rem 0.875rem; border-radius: 6px;
+            text-decoration: none; font-weight: 600; font-size: 0.8125rem;
+            transition: background 0.2s;
+        }
+        .btn-resume:hover { background: rgba(13,13,13,.08); }
+
+        .btn-approve {
+            background: var(--purple); color: #fff;
+            border: none; border-radius: 6px;
+            padding: 0.6rem 1rem;
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.75rem;
+            letter-spacing: 0.03em; text-transform: uppercase;
+            cursor: pointer; transition: background 0.2s, transform 0.2s;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .btn-approve:hover { background: #6d28d9; transform: translateY(-1px); }
+
+        .empty-state {
+            text-align: center; padding: 4rem 2rem; color: var(--muted);
+            border: 1px dashed var(--border-s); border-radius: 12px; margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="table-card">
+
+    <a th:href="@{/admin/dashboard}" href="#" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.8125rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:2rem;transition:color .2s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--muted)'">
+        <i class="fas fa-arrow-left" style="font-size:.7rem;"></i> Back to dashboard
+    </a>
+
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.625rem;">
+        <div style="width:40px;height:40px;border-radius:10px;background:#f3f0ff;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-inbox" style="color:var(--purple);font-size:1rem;"></i>
+        </div>
+        <h1 style="font-size:1.5rem;font-weight:800;letter-spacing:-.03em;" class="syne">Pending Applications</h1>
+    </div>
+    <p style="font-size:.875rem;color:var(--muted);font-weight:300;margin-bottom:1rem;line-height:1.6;">Review and approve prospective instructors for the Radical platform.</p>
+
+    <table th:if="${not #lists.isEmpty(applications)}">
+        <thead>
+        <tr>
+            <th>Applicant Name</th>
+            <th>Email Address</th>
+            <th>Bio Snippet</th>
+            <th>Document</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="app : ${applications}">
+            <td style="font-weight: 500;" th:text="${app.fullName}">John Doe</td>
+            <td th:text="${app.email}">john@example.com</td>
+            <td class="td-bio" th:text="${app.bio}">Senior software engineer with 10 years of experience...</td>
+            <td>
+                <a th:href="@{'/uploads/' + ${app.resumeFileName}}" target="_blank" class="btn-resume">
+                    <i class="fas fa-file-pdf" style="color: var(--accent);"></i> Resume
+                </a>
+            </td>
+            <td>
+                <form th:action="@{'/admin/applications/approve/' + ${app.id}}" method="POST" style="margin: 0;">
+                    <button type="submit" class="btn-approve">
+                        Approve &rarr;
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${#lists.isEmpty(applications)}" class="empty-state">
+        <i class="fas fa-folder-open" style="font-size: 2rem; opacity: 0.5; margin-bottom: 1rem;"></i>
+        <h3 class="syne" style="font-size: 1.1rem; font-weight: 700; color: var(--ink); margin-bottom: 0.35rem;">You're all caught up!</h3>
+        <p style="font-size: 0.875rem; font-weight: 300;">There are no pending instructor applications at the moment.</p>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -30,6 +30,9 @@
     <p style="font-size:.875rem;color:var(--muted);font-weight:300;margin-bottom:2rem;line-height:1.6;">Grant teaching privileges to a new user. They bypass standard student registration.</p>
 
     <form th:action="@{/admin/create-instructor}" th:object="${instructor}" method="POST" style="display:flex;flex-direction:column;gap:1.125rem;">
+
+        <input type="hidden" name="pendingAppId" th:if="${pendingAppId != null}" th:value="${pendingAppId}" />
+
         <div>
             <label style="display:block;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;">Full name</label>
             <input type="text" th:field="*{name}" placeholder="John Doe"

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Apply to Teach | Radical</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0d0d0d;
+            --paper: #f7f5f0;
+            --accent: #e8401c;
+            --purple: #7c3aed;
+            --muted: #7a7672;
+            --border-s: #e5e2dc;
+            --card-bg: #ffffff;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+        }
+
+        h1, h2, .syne { font-family: 'Syne', sans-serif; }
+
+        /* Grain Overlay */
+        body::after {
+            content: '';
+            position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: .025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(13,13,13,.1);
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.06);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 1.25rem; }
+
+        label {
+            display: block;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.45rem;
+            color: var(--ink);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            background: #fff;
+            border: 1.5px solid var(--border-s);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9375rem;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(232, 64, 28, 0.1);
+        }
+
+        textarea { resize: vertical; min-height: 100px; }
+
+        /* File Upload Styling */
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%;
+            border: 1.5px dashed var(--border-s);
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            background: rgba(13,13,13,0.02);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--accent);
+            background: rgba(232, 64, 28, 0.02);
+        }
+
+        input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer;
+        }
+
+        .file-text {
+            font-size: 0.875rem; color: var(--muted); pointer-events: none;
+        }
+        .file-text span { color: var(--accent); font-weight: 600; text-decoration: underline; }
+
+        /* Buttons */
+        .btn-submit {
+            width: 100%;
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.875rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.875rem;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            margin-top: 1rem;
+        }
+
+        .btn-submit:hover {
+            background: #2a2a2a;
+            transform: translateY(-1px);
+        }
+
+        .error-text {
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-top: 0.35rem;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <a th:href="@{/}" href="#" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.8125rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:2rem;transition:color .2s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--muted)'">
+        <i class="fas fa-arrow-left" style="font-size:.7rem;"></i> Back to Home
+    </a>
+
+    <div style="margin-bottom: 2rem;">
+        <h1 class="syne" style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.5rem;">Join the Faculty.</h1>
+        <p style="font-size: 0.9375rem; color: var(--muted); font-weight: 300; line-height: 1.6;">Share your expertise with the world. Apply to become a Radical Instructor today.</p>
+    </div>
+
+    <div th:if="${error}" style="background: rgba(232, 64, 28, 0.1); border: 1px solid rgba(232, 64, 28, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+        <i class="fas fa-exclamation-circle" style="color: var(--accent); margin-top: 0.15rem;"></i>
+        <p style="font-size: 0.875rem; color: var(--accent);" th:text="${error}"></p>
+    </div>
+
+    <form th:action="@{/apply-instructor}" th:object="${application}" method="POST" enctype="multipart/form-data">
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" th:field="*{fullName}" placeholder="Jane Doe" required />
+            <span th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error-text"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" th:field="*{email}" placeholder="jane@example.com" required />
+            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-text"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Phone Number (Optional)</label>
+            <input type="text" th:field="*{phone}" placeholder="+1 (555) 000-0000" />
+            <span th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="error-text"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Professional Bio</label>
+            <textarea th:field="*{bio}" placeholder="Tell us about your technical background and what you'd like to teach..." required></textarea>
+            <span th:if="${#fields.hasErrors('bio')}" th:errors="*{bio}" class="error-text"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Resume / CV</label>
+            <div class="file-upload-wrapper">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 1.5rem; color: var(--muted); margin-bottom: 0.75rem;"></i>
+                <p class="file-text"><span>Click to upload</span> or drag and drop<br><small style="opacity: 0.7;">PDF or Word documents only</small></p>
+                <input type="file" name="resume" accept=".pdf,.doc,.docx" required />
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Application &rarr;</button>
+
+    </form>
+</div>
+
+<script>
+    document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+        var fileName = e.target.files[0].name;
+        var fileText = document.querySelector('.file-text');
+        fileText.innerHTML = '<span style="color: var(--ink);"><i class="fas fa-file-alt" style="margin-right: 5px;"></i>' + fileName + '</span>';
+    });
+</script>
+
+</body>
+</html>
